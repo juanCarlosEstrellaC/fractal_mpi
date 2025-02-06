@@ -146,47 +146,7 @@ void mandelbrotCpu(int rank, int nprocs, std::vector<int>& buffer_local) {
     }
 }
 
-// Función para pintar en pantalla
-void paint() {
-    fps.update();
-
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel_buffer);
-
-    glBegin(GL_QUADS);{
-        glTexCoord2f(0, 1);
-        glVertex3f(-1, -1, 0);
-
-        glTexCoord2f(0, 0);
-        glVertex3f(-1, 1, 0);
-
-        glTexCoord2f(1, 0);
-        glVertex3f(1, 1, 0);
-
-        glTexCoord2f(1, 1);
-        glVertex3f(1, -1, 0);
-    }
-    glEnd();
-}
-
-void loop() {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
-    while (!glfwWindowShouldClose(window)) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        paint();
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-}
-
-void run() {
-    init();
-    loop();
-    glfwTerminate();
-}
-
-int main(int argc, char* argv[]) {
+void aux(int argc, char* argv[]){
     MPI_Init(&argc, &argv);
 
     int rank, nprocs;
@@ -214,11 +174,57 @@ int main(int argc, char* argv[]) {
                 pixel_buffer, recvcounts.data(), displs.data(), MPI_INT,
                 0, MPI_COMM_WORLD);
 
-    if (rank == 0) {
+    /*if (rank == 0) {
         run();
         delete[] pixel_buffer;
-    }
+    }*/
 
     MPI_Finalize();
+}
+
+void paint(int argc, char* argv[]) {
+    fps.update();
+
+    aux(argc,argv);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, WIDTH, HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel_buffer);
+
+    glBegin(GL_QUADS);{
+        glTexCoord2f(0, 1);
+        glVertex3f(-1, -1, 0);
+
+        glTexCoord2f(0, 0);
+        glVertex3f(-1, 1, 0);
+
+        glTexCoord2f(1, 0);
+        glVertex3f(1, 1, 0);
+
+        glTexCoord2f(1, 1);
+        glVertex3f(1, -1, 0);
+    }
+    glEnd();
+}
+
+void loop(int argc, char* argv[]) {
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        paint(argc, argv);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+}
+
+void run(int argc, char* argv[]) {
+    init();
+    loop( argc,  argv);
+    glfwTerminate();
+}
+
+
+int main(int argc, char* argv[]) {
+    run( argc,  argv);
+    delete[] pixel_buffer;
     return 0;
 }
