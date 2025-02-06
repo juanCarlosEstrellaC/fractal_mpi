@@ -1,0 +1,2 @@
+#pragma code_page(65001)
+1 /* CREATEPROCESS_MANIFEST_RESOURCE_ID */ 24 /* RT_MANIFEST */ "C:/Users/Lap/CLionProjects/ejemplo02_fractal2 - MPI/cmake-build-debug/CMakeFiles/ejemplo02_fractal2.dir/embed.manifest"
